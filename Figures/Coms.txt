@@ -1,0 +1,68 @@
+******************
+* MACKEY - GLASS *
+******************
+
+trainMG (cf 4.9 ET 4.12)
+------------------------
+Entraînement d'un RC sur MG
+
+
+lockMG (cf 2.2)
+---------------
+Verrouillage MG sur MG :
+	h = 1
+	q = 0.5
+
+compareLockMG (cf slide 21)
+---------------------------
+Comparaison de verrouillages MG sur MG avec h = 1 et :
+	q = 0.5 sans bruit (vert foncé)
+	q = 0.25 sans bruit (vert clair)
+	q = 0.25 avec bruit uniforme d'amplitude 10^-10 (jaune olive)
+
+
+RClockMG (cf 5.2)
+-----------------
+Verrouillage RC sur MG :
+	h = 1
+	q = 0.95 (jusque t = 1000 s)
+
+superpositionRC-MG (cf 5.3)
+---------------------------
+Décryptage par superposition avec utilisation d'un RC entraîné qui se verrouille sur MG :
+	h = 1
+	pas de répétitions (h = 1 => 1 bits/s)
+	160 bits de verrouillage
+	400 bits de message
+	amplitude message = 10^-2
+	pas de bruit
+
+**********
+* LORENZ *
+**********
+
+trainLo (analogue 4.9 ET 4.12)
+------------------------------
+Entraînement d'un RC sur Lorenz
+
+lockLo (analogue 2.2)
+---------------------
+Verrouillage Lorenz sur Lorenz 
+	h = 0.02
+	q = 0.5
+
+RClockLo (analogue 5.2)
+-----------------------
+Verrouillage RC sur Lorenz
+	h = 0.02
+	q = 0.95 (jusque t = 100 s)
+
+superpositionRC-Lo (analogue  5.3)
+----------------------------------
+Décryptage par superposition avec utilisation d'un RC entraîné qui se verrouille sur Lorenz :
+	h = 0.02
+	pas de répétitions (h = 0.02 => 50 bits/s)
+	1600 bits de verrouillage
+	4000 bits de message
+	amplitude message = 10^-2
+	pas de bruit
