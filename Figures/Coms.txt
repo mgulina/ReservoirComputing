@@ -24,8 +24,22 @@ Comparaison de verrouillages MG sur MG avec h = 1 et :
 RClockMG (cf 5.2)
 -----------------
 Verrouillage RC sur MG :
-	h = 1
-	q = 0.95 (jusque t = 1000 s)
+	h = 0.5
+	q = 0.95 jusque t = 1000 s puis q = 0
+
+RClockMG2 (cf 5.2)
+-----------------
+Reservoir :
+	taille = 1500
+	W_ij \in [-0.5, 0.5] avec 99% de 0
+	rayon spectral de W = 0.79
+	gainIn = 1 = gainFb
+	Cste globale = 0.44
+	Leak = 0.9
+
+Verrouillage RC sur MG :
+	h = 0.5
+	q = 0 jusque t = 500 puis q = 0.8 jusque 1500 puis q = 0 jusque 2000
 
 superpositionRC-MG (cf 5.3)
 ---------------------------
@@ -55,7 +69,7 @@ RClockLo (analogue 5.2)
 -----------------------
 Verrouillage RC sur Lorenz
 	h = 0.02
-	q = 0.95 (jusque t = 100 s)
+	q = 0.95 jusque t = 100 s puis q = 0
 
 superpositionRC-Lo (analogue  5.3)
 ----------------------------------

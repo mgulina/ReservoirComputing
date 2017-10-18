@@ -13,20 +13,23 @@ log10_mse_lock = log10(mse_lock) %#ok<*NOPTS>
 subplot(211); hold on;
     plot(T_out,primaire,'b-x','LineWidth',trait); 
     plot(T_out,lock,'r-o','LineWidth',trait);
-    plot(T_out,unlock,'k','LineWidth',trait);
-    title('Comparaison de l''évolution des systèmes','FontSize',texte);
-    xlabel('$t [s]$','FontSize',texte,'Interpreter','Latex');
+%     plot(T_out,unlock,'k','LineWidth',trait);
+    title('Comparison of the evolution of the systemes','FontSize',texte);
+    xlabel('$t [AU]$','FontSize',texte,'Interpreter','Latex');
     ylabel('$[AU]$','FontSize',texte,'Interpreter','Latex');
-    legend('Primaire','Verrouillé','Non verrouillé',...
+%     legend('Primaire','Verrouillé','Non verrouillé',...
+%         'Location','SouthEast');
+    legend('Primary','Locked',...
         'Location','SouthEast');
     set(gca,'FontSize',texte);
 
 subplot(212); hold on;
     plot(T_out,log10(ER_lock),'g-*','LineWidth',trait); hold on;
-    plot(T_out,EA_lock,'b-*','LineWidth',trait);
-    title('Evolution de l''erreur relative entre le primaire et le verrouillé','FontSize',texte);
-    xlabel('$t [s]$','FontSize',texte,'Interpreter','Latex');
+%     plot(T_out,EA_lock,'b-*','LineWidth',trait);
+%     title('Evolution de l''erreur relative entre le primaire et le verrouillé','FontSize',texte);
+    title('Logarithmic evolution of the relative error','FontSize',texte);
+    xlabel('$t [AU]$','FontSize',texte,'Interpreter','Latex');
     ylabel('$\mathcal{R}$','FontSize',texte,'Interpreter','Latex');
-    legend('Log de l''erreur relative','Erreur absolue',...
-        'Location','SouthEast');
+%     legend('Log de l''erreur relative','Erreur absolue',...
+%         'Location','SouthEast');
     set(gca,'FontSize',texte);

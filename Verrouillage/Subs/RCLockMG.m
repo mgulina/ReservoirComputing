@@ -7,6 +7,10 @@
 disp('Verrouillage RC sur MG');
 
 %% 1 - Initialisation
+if ~exist('doneRClockMG','var')
+    doneRClockMG = 0;
+end
+
 %% 1.1 - Intervalle d'intégration
 if ~exist('T_tot','var')
     T_tot = 3000; % Intégration sur [0 T_tot]
@@ -15,9 +19,14 @@ end
 if ~exist('h','var')
     h = 0.5; % Pas d'intégration
 end
+if ~exist('T_lock','var')
+    T_lock = round(T/h/4); % Début du verrouillage
+elseif doneRClockMG == 0
+    T_lock = round(T_lock/h);
+end
 if ~exist('T_libre','var')
     T_libre = round(T/h/2); % Arrêt du verrouillage
-else
+elseif doneRClockMG == 0
     T_libre = round(T_libre/h);
 end
 T_out = 0:h:T_tot; % Discrétisation du temps
@@ -28,7 +37,7 @@ if ~exist('Message','var')
 end
 
 %% 1.2 - Récupération des données du RC
-if ~exist('doneRClockMG','var')
+if doneRClockMG == 0
 % Etat final
 s = S(end,:);
 SLock = zeros(T,N+K); SLock(1,:) = s;
@@ -52,8 +61,8 @@ unlock = zeros(T,1);
 lock = zeros(T,1);
 
 %% 1.4 - Efficacité du verrouillage
-q = 0.95;
-p = 1-q; % MG'(t) = p*f(MG'(t-tau)) + q*MG(t)
+% q = 0.95;
+% p = 1-q; % MG'(t) = p*f(MG'(t-tau)) + q*MG(t)
 
 %% 2 - verrouillage
 % hw = waitbar(0,'Calculs en cours. Veuillez patienter...');
@@ -82,6 +91,7 @@ for t = 1:T-1
                       u(:,t+1),unlock(t),unifrnd(-LvlNoiseRC,LvlNoiseRC,N,1)); 
     
     %% 2.3 - Système secondaire avec verrouillage
+    if t < T_lock, p = 1; else p = 0.2; end
     if t > T_libre, p = 1; end
     lock(t) = p*W_out*SLock(t,:)' +(1-p)*(primaire(t) ...
               + unifrnd(-LvlNoiseVerrou,LvlNoiseVerrou,1,1));

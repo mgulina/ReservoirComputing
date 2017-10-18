@@ -30,6 +30,8 @@ s = S(end,:);
 SLock = zeros(T,N+K); SLock(1,:) = s;
 SUnlock = SLock;
 
+doneRClockLo = 0;
+
 else
     SLock = zeros(T,N+K); SLock(1,:) = s;
     SUnlock = SLock;
@@ -53,8 +55,15 @@ unlock = [-10 ; zeros(T-1,1)];
 q = 0.95;
 p = 1-q; % MG'(t) = p*f(MG'(t-tau)) + q*MG(t)
 
-if ~exist('tStop','var')
-    tStop = round(T/2); % Arrêt du verrouillage
+if ~exist('T_lock','var')
+    T_lock = round(T/h/4); % Début du verrouillage
+elseif doneRClockLo == 0
+    T_lock = round(T_lock/h);
+end
+if ~exist('T_libre','var')
+    T_libre = round(T/2); % Arrêt du verrouillage
+elseif doneRClockLo == 0
+    T_libre = round(T_libre/h);
 end
 
 % lock3d = 1; % 0 : Verrouillage sur X ; 1 : Verrouillage sur X, Y et Z
@@ -79,7 +88,8 @@ for t = 1:T-1
                       u(:,t+1),unlock(t),unifrnd(-LvlNoiseRC,LvlNoiseRC,N,1)); 
     
     %% 2.3 - Système secondaire avec verrouillage
-    if t > tStop, p = 1; end
+    if t < T_lock, p = 1; else p = 0.1; end
+    if t > T_libre, p = 1; end
     lock(t) = p*W_out*SLock(t,:)' +(1-p)*(primaire(t) ...
               + unifrnd(-LvlNoiseVerrou,LvlNoiseVerrou,1,1));
           
@@ -97,7 +107,7 @@ lock(T) = p*W_out*SLock(T,:)' +(1-p)*(primaire(T) ...
 %% 3 - Calcul d'erreurs et affichage
 figRCLockLo = figure('units','normalized',...
         'outerposition',outerPos,...
-        'Name','Verrouillage du réservoir sur un Mackey - Glass',...
+        'Name','Verrouillage du réservoir sur un Lorenz',...
         'Visible','Off');
 
 calcErreursLock;

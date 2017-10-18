@@ -43,7 +43,8 @@ elseif cas == 3
     mainPredictMG;
     tic;
     T_tot = 2000;
-    T_libre = 1000;
+    T_lock = 500;
+    T_libre = 1500;
     RCLockMG;
     DureeLock = toc;
     
@@ -100,6 +101,9 @@ elseif cas == 6
     rk4 = 0;
     mainPredictLorenz;
     tic;
+    T_tot = 200;
+    T_lock = 50;
+    T_libre = 150;
     RCLockLo;
     DureeLock = toc;
     

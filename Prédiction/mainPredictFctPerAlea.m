@@ -5,7 +5,7 @@
 % ------------------------------------------------------
 
 clc; close all;
-clearvars -except cas outerPos trait texte outerPos;
+clearvars -except calcMSE nMSE cas outerPos trait texte outerPos;
 format short;
 
 %% Options graphiques

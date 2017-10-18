@@ -13,7 +13,7 @@ if draplock
     clc; close all; %#ok<UNRCH>
 else
     clc; close all;
-    clearvars -except cas outerPos trait texte outerPos;
+    clearvars -except calcMSE nMSE cas outerPos trait texte outerPos;
     format short;
 end
 
