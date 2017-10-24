@@ -8,9 +8,9 @@ disp('Verrouillage RC sur RC');
 
 %% 1 - Initialisation
 %% 1.1 - Intervalle d'intégration
-if ~exist('T_tot','var')
-    T_tot = 3000; % Intégration sur [0 T_tot]
-end
+T_tot = 2000; % Intégration sur [0 T_tot]
+T_lock = 500; % Début du verrouillage
+T_libre = 1500; % Arrêt du verrouillage
 if ~exist('h','var')
     h = 0.5; % Pas d'intégration
 end
@@ -41,9 +41,11 @@ unlock = zeros(T,1);
 lock = zeros(T,1);
 
 
-%% 1.4 - Efficacité du verrouillage
-q = 0.25;
-p = 1-q; % MG'(t) = p*f(MG'(t-tau)) + q*MG(t)
+%% 1.4 - Paramètres du verrouillage
+if ~exist('q','var')
+    q = 0.25;
+end
+% p = 1-q; % MG'(t) = p*f(MG'(t-tau)) + q*MG(t)
 
 %% 2 - verrouillage
 % hw = waitbar(0,'Calculs en cours. Veuillez patienter...');
@@ -63,17 +65,19 @@ for t = 1:T-1
                             SUnlock(t,1:N)',u2(:,t+1),unlock(t),noise);                        
     
     %% 2.3 - Système secondaire avec verrouillage
-    lock(t) = p*W_out2*SLock(t,:)' + q*(primaire(t) ...
+    if t < T_lock/h, p = 1; else p = 1-q; end
+    if t > T_libre/h, p = 1; end
+    lock(t) = p*W_out2*SLock(t,:)' + (1-p)*(primaire(t) ...
               + unifrnd(-LvlNoiseVerrou,LvlNoiseVerrou,1,1));
           
-    SLock(t+1,:) = MajRes(f_RC,delta2,a2,C2,W_in2,W2,W_fb2, ...
+    SLock(t+1,:) = majRes(f_RC,delta2,a2,C2,W_in2,W2,W_fb2, ...
                             SLock(t,1:N)',u2(:,t+1),lock(t),noise);                                     
             
 %     waitbar(t/T,hw);
 end
 primaire(T) = W_out1*Sprimaire(T,:)';
 unlock(T) = W_out2*SUnlock(T,:)'; 
-lock(T) = p*W_out2*SLock(T,:)' + q*(primaire(T) ...
+lock(T) = p*W_out2*SLock(T,:)' + (1-p)*(primaire(T) ...
               + unifrnd(-LvlNoiseVerrou,LvlNoiseVerrou,1,1));
           
 if ChangeScaleMG
@@ -84,13 +88,15 @@ end
 % close(hw)
 
 %% 3 - Calcul d'erreurs et affichage
-figMGLockRC = figure('units','normalized',...
+figRCLockRC = figure('units','normalized',...
         'outerposition',outerPos,...
         'Name','Verrouillage d''un réservoir Mackey - Glass sur un autre',...
         'Visible','Off');
     
 calcErreursLock;
 
-set(figMGLockRC,'visible','on');
+set(figRCLockRC,'visible','on');
+
+doneRClockRC = 1;
 
 clearvars ER_libre MG;

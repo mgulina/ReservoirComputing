@@ -4,14 +4,16 @@
 % Programme principal
 % -------------------
 
+%% 1 - Initialisation
 clc; close all; clearvars; format short; 
 
 cas = menu('Choisissez le type de verrouillage',...
-                'MG-MG','MG-RC','RC-MG','RC-RC','L-L','RC-L');
+                'MG-MG','MG-RC','RC-MG','RC-RC','L-L','RC-L','Compare q');
 draplock = 1;
 pause(10^-1);
 
-% Options graphiques
+%% 2 - Options
+%% 2.1 - Options graphiques
 fullScreen = 1; % 1 : Affichage en plein écran ; 0 : affichage dans une fenêtre
 
 if fullScreen
@@ -25,31 +27,24 @@ else
 end
 % OuterPosTrain = [0.06  0.21  0.7 0.7];
 
+%% 2.2 - Métrique d'erreur
+calcMSE = 1; % 1 : NRMSE ; 0 : Erreur relative
+nMSE = 100;   % Décomposition de 1+theta:T-trainEnd en intervalles de nMSE pas de temps
 
+%% 3 - Lancement du programme de verrouillage
 if cas == 1
-    Duree = 0;
-    tic;
     MGLockMG;
-    DureeLock = toc;
     
 elseif cas == 2   
     mainPredictMG;
-    tic;
     MGLockRC;
-    DureeLock = toc;
     
 elseif cas == 3
     rk4 = 0;
     mainPredictMG;
-    tic;
-    T_tot = 2000;
-    T_lock = 500;
-    T_libre = 1500;
     RCLockMG;
-    DureeLock = toc;
     
 elseif cas == 4
-    tic;
     CI = 0.1;
     cibleMG;
 %     cibleMG2004;    
@@ -65,7 +60,6 @@ elseif cas == 4
     W_out1 = W_out; s1 = S(end,:);
     log10_mse_train1 = log10_mse_train;
     log10_mse_libre1 = log10_mse_libre;
-    log10_nrmse84_1 = log10_nrmse84;
     
     CI = 0.5;
     cibleMG;
@@ -82,34 +76,24 @@ elseif cas == 4
     W_out2 = W_out; s2 = S(end,:);
     log10_mse_train2 = log10_mse_train;
     log10_mse_libre2 = log10_mse_libre;
-    log10_nrmse84_2 = log10_nrmse84;
+    
     clearvars delta a C W_in W W_fb W_out S log10_mse_train ...
               log10_mse_libre log10_nrmse84;
-    Duree = toc;
-    
-    tic;
-    RCLockRC;
-    DureeLock = toc;    
+          
+    RCLockRC;  
 
 elseif cas == 5
-    Duree = 0;
-    tic;
     LoLockLo;
-    DureeLock = toc;
     
 elseif cas == 6
     rk4 = 0;
     mainPredictLorenz;
-    tic;
-    T_tot = 200;
-    T_lock = 50;
-    T_libre = 150;
     RCLockLo;
-    DureeLock = toc;
+
+elseif cas == 7
+    compare_q;
     
 else
     helpdlg('Programme avorté','Programme avorté');
     return;
 end
-
-Duree = Duree + DureeLock;

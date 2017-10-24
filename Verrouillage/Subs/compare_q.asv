@@ -1,0 +1,14 @@
+% Verrouillage de deux systèmes MG avec deux efficacités différentes 
+% ******************************************************************
+
+q = 0.25;
+MGLockMG;
+
+primaire1 = primaire;
+lock1 = lock;
+unlock1 = unlock;
+ER_lock1 = ER_lock;
+nrmse1 = nrmse;
+
+
+

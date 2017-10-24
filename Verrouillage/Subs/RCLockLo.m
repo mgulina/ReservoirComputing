@@ -8,9 +8,9 @@ disp('Verrouillage RC sur Lorenz');
 
 %% 1 - Initialisation
 %% 1.1 - Intervalle d'intégration
-if ~exist('T_tot','var')
-    T_tot = 50; % Intégration sur [0 T_tot]
-end
+T_tot = 50; % Intégration sur [0 T_tot]
+T_lock = 20; % Début du verrouillage
+T_libre = 40; % Arrêt du verrouillage
 
 if ~exist('h','var')
     h = 0.02; % Pas d'intégration
@@ -52,25 +52,16 @@ primaire = [10 0 0 ; zeros(T-1,3)];
 unlock = [-10 ; zeros(T-1,1)];
 
 %% 1.5 - Paramètres du verrouillage
-q = 0.95;
-p = 1-q; % MG'(t) = p*f(MG'(t-tau)) + q*MG(t)
-
-if ~exist('T_lock','var')
-    T_lock = round(T/h/4); % Début du verrouillage
-elseif doneRClockLo == 0
-    T_lock = round(T_lock/h);
+if ~exist('q','var')
+    q = 0.25;
 end
-if ~exist('T_libre','var')
-    T_libre = round(T/2); % Arrêt du verrouillage
-elseif doneRClockLo == 0
-    T_libre = round(T_libre/h);
-end
+% p = 1-q;
 
 % lock3d = 1; % 0 : Verrouillage sur X ; 1 : Verrouillage sur X, Y et Z
 
 LvlNoiseVerrou = 0; 10^-4; % Niveau de Bruit
 
-lock = [p*unlock(1) + q*primaire(1,1) ; zeros(T-2,1)];
+lock = [unlock(1) ; zeros(T-2,1)];
 
 %% 2 - verrouillage
 % hw = waitbar(0,'Calculs en cours. Veuillez patienter...');
@@ -88,8 +79,8 @@ for t = 1:T-1
                       u(:,t+1),unlock(t),unifrnd(-LvlNoiseRC,LvlNoiseRC,N,1)); 
     
     %% 2.3 - Système secondaire avec verrouillage
-    if t < T_lock, p = 1; else p = 0.1; end
-    if t > T_libre, p = 1; end
+    if t < T_lock/h, p = 1; else p = 1-q; end
+    if t > T_libre/h, p = 1; end
     lock(t) = p*W_out*SLock(t,:)' +(1-p)*(primaire(t) ...
               + unifrnd(-LvlNoiseVerrou,LvlNoiseVerrou,1,1));
           

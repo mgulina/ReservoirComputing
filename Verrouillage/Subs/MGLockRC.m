@@ -8,9 +8,9 @@ disp('Verrouillage MG sur RC');
 
 %% 1 - Initialisation
 %% 1.1 - Intervalle d'intégration
-if ~exist('T_tot','var')
-    T_tot = 3000; % Intégration sur [0 T_tot]
-end
+T_tot = 2000; % Intégration sur [0 T_tot]
+T_lock = 500; % Début du verrouillage
+T_libre = 1500; % Arrêt du verrouillage
 if ~exist('h','var')
     h = 0.5; % Pas d'intégration
 end
@@ -40,11 +40,12 @@ primaire = zeros(T,1);
 unlock = [0.5 ; zeros(T-1,1)];
 
 %% 1.4 - Efficacité du verrouillage
-q = 0.25;
-p = 1-q; % MG'(t) = p*f(MG'(t-tau)) + q*MG(t)
+if ~exist('q','var')
+    q = 0.25;
+end
+% p = 1-q; % MG'(t) = p*f(MG'(t-tau)) + q*MG(t)
 
-lock = [p*unlock(1) + (1-p)*(primaire(1) ...
-    + unifrnd(-LvlNoiseVerrou,LvlNoiseVerrou,1,1)) ; zeros(T-2,1)];
+lock = [unlock(1) ; zeros(T-2,1)];
 
 %% 2 - verrouillage
 % hw = waitbar(0,'Calculs en cours. Veuillez patienter...');
@@ -80,7 +81,9 @@ for t = 1:T-1
     else
         Y_T = lock(t+1-round(tau/h)); 
     end
-        
+     
+    if t < T_lock/h, p = 1; else p = 1-q; end
+    if t > T_libre/h, p = 1; end 
     lock(t+1) = p*MG_rk4(h,lock(t),Y_T) ...
                 +(1-p)*( primaire(t+1) ...
                 + unifrnd(-LvlNoiseVerrou,LvlNoiseVerrou,1,1) );                

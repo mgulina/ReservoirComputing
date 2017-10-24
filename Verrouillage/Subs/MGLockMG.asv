@@ -32,7 +32,8 @@ end
 %% 1.5 - Bruit pendant le verrouillage
 LvlNoiseVerrou = 0;10^-10; % Niveau de Bruit
 
-lock = [unlock(1) ; zeros(T-1,1)];
+lock = [unlock(1) + q*(primaire(1) + ...
+    LvlNoiseVerrou*unifrnd(-1,1)) ; zeros(T-1,1)];
 
 %% 2 - Verrouillage
 % hw = waitbar(0,'Calculs en cours. Veuillez patienter...');

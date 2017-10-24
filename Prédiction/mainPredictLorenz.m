@@ -42,7 +42,7 @@ DureeTrain = toc;
 %% 4 - Calcul d'erreur et affichage
 tic;
 calcErreursTrain;
-set(figErreurRC,'visible','on'); pause(10^-1);
+% set(figErreurRC,'visible','on'); pause(10^-1);
 DureeErreur = toc;
 
 %% 5 - Tests supplémentaires

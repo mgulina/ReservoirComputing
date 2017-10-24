@@ -40,6 +40,7 @@ if ~fullTrain
             mse_libre(i) = sqrt(mean(EA_libre{i}.^2));
             nrmse_libre(i) = mse_libre(i)/(max(Cible(libreSeq(tMSE(i):tMSE(i+1)))) - min(Cible(libreSeq(tMSE(i):tMSE(i+1)))));
         end
+        log10_mse_libre = log10(mse_libre);
     end
 end
 

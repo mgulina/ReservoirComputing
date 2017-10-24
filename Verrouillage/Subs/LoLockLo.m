@@ -12,7 +12,9 @@ global sigma r b;
 sigma = 10; r = 28; b = 8/3;
 
 %% 1.2 - Intervalle d'intégration
-T_tot = 20; % Intégration sur [0 T_tot]
+T_tot = 50; % Intégration sur [0 T_tot]
+T_lock = 20; % Début du verrouillage
+T_libre = 40; % Arrêt du verrouillage
 h = 0.02; % Pas d'intégration
 T_out = 0:h:T_tot; % Discrétisation du temps
 T = length(T_out); % Nombre de points
@@ -22,16 +24,16 @@ primaire = [10 0 0 ; zeros(T-1,3)];
 unlock = [-10 0 0 ; zeros(T-1,3)];
 
 %% 1.4 - Paramètres du verrouillage
-q = 0.25; % Parfait à eps près pour q >= 0.25
-p = 1-q; % MG'(t) = p*f(MG'(t-tau)) + q*MG(t)
-
-tStop = T_tot; % Temps après lequel le verrouillage est coupé
+if ~exist('q','var')
+    q = 0.25; % Parfait à eps près pour q >= 0.25
+end
+% p = 1-q; % MG'(t) = p*f(MG'(t-tau)) + q*MG(t)
 
 lock3d = 1; % 0 : Verrouillage sur X ; 1 : Verrouillage sur X, Y et Z
 
 LvlNoiseVerrou = 0; 10^-4; % Niveau de Bruit
 
-lock = [p*unlock(1,:) + q*primaire(1,:) ; zeros(T-2,3)];
+lock = [unlock(1,:) ; zeros(T-2,3)];
 
 %% 2 - Verrouillage
 % hw = waitbar(0,'Calculs en cours. Veuillez patienter...');
@@ -44,24 +46,20 @@ for t = 1:T-1
     unlock(t+1,:) = Lorenz_rk4(h,unlock(t,:)); 
     
     %% 2.3 - Système secondaire avec verrouillage
-    
-    if t < tStop/h
-
-        if lock3d
-            lock(t+1,:) = p*Lorenz_rk4(h,lock(t,:)) + q*primaire(t+1,:) + LvlNoiseVerrou*unifrnd(-1,1,1,3);
-        else
-            lock(t+1,:) = p*Lorenz_rk4(h,lock(t,:)) + q*[primaire(t+1,1) lock(t,2:3)] + LvlNoiseVerrou*unifrnd(-1,1,1,3);
-        end
+    if t < T_lock/h, p = 1; else p = 1-q; end
+    if t > T_libre/h, p = 1; end
+    if lock3d
+        lock(t+1,:) = p*Lorenz_rk4(h,lock(t,:)) + (1-p)*primaire(t+1,:) + LvlNoiseVerrou*unifrnd(-1,1,1,3);
     else
-        lock(t+1,:) = Lorenz_rk4(h,lock(t,:));
+        lock(t+1,:) = p*Lorenz_rk4(h,lock(t,:)) + (1-p)*[primaire(t+1,1) lock(t,2:3)] + LvlNoiseVerrou*unifrnd(-1,1,1,3);
     end
-            
+           
 %     waitbar(t/T,hw);
 end
 % close(hw)
 
 %% 3 - Calcul d'erreurs et affichage
-figMGLockMG = figure('units','normalized',...
+figLoLockLo = figure('units','normalized',...
         'outerposition',outerPos,...
         'Name','Verrouillage d''un Lorenz sur un autre',...
         'Visible','Off');
@@ -72,4 +70,6 @@ lock = lock(:,1);
 
 calcErreursLock;
 
-set(figMGLockMG,'visible','on');
+doneLolockLo = 1;
+
+set(figLoLockLo,'visible','on');
