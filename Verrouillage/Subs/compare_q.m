@@ -34,39 +34,57 @@ figMGLockMG_compare = figure('units','normalized',...
         'Name','Verrouillage d''un Mackey - Glass sur un autre',...
         'Visible','Off');
 
-if ~calcMSE
-    plot(T_out,log10(ER_lock1),'g-*','LineWidth',trait); hold on;
-    plot(T_out,log10(ER_lock2),'k-*','LineWidth',trait);
+subplot(211); hold on;
+    plot(T_out,primaire,'b-x','LineWidth',trait); 
+    plot(T_out,lock1,'r-o','LineWidth',trait);
+    plot(T_out,lock2,'k','LineWidth',trait);
 
-%     title('Evolution de l''erreur relative entre le primaire et le verrouillé','FontSize',texte);
-    title('Logarithmic evolution of the relative error','FontSize',texte);
-    xlabel('$t [AU]$','FontSize',texte,'Interpreter','Latex');
-    ylabel('$\mathcal{R}$','FontSize',texte,'Interpreter','Latex');
-
-    legend(['q = ',num2str(q1)],['q = ',num2str(q2)],...
-        'Location','SouthEast');
-    
-    plot([T_lock T_lock],get(gca,'ylim'),'m','LineWidth',trait);
-    plot([T_libre T_libre],get(gca,'ylim'),'m','LineWidth',trait);
-
-    set(gca,'FontSize',texte);
-    axis tight;
-else
-    plot(T_out(tMSE),log10(nrmse1),'g-*','LineWidth',trait); hold on;
-    plot(T_out(tMSE),log10(nrmse2),'k-*','LineWidth',trait);
-   
-    title('Logarithmic evolution of the NRMSE','FontSize',texte);
+    title('Evolution of the systems','FontSize',texte);
     xlabel('$t [AU]$','FontSize',texte,'Interpreter','Latex');
     ylabel('$[AU]$','FontSize',texte,'Interpreter','Latex');
-
-    legend(['q = ',num2str(q1)],['q = ',num2str(q2)],...
-        'Location','SouthEast');
+    
+    legend('Primary',['Locked with q = ',num2str(q1)],...
+        ['Locked with q = ',num2str(q2)], 'Location','SouthEast');
     
     plot([T_lock T_lock],get(gca,'ylim'),'m','LineWidth',trait);
     plot([T_libre T_libre],get(gca,'ylim'),'m','LineWidth',trait);
-
-    set(gca,'FontSize',texte); 
+    set(gca,'FontSize',texte);
     axis tight;
-end
     
+subplot(212);
+    if ~calcMSE
+        plot(T_out,log10(ER_lock1),'g-*','LineWidth',trait); hold on;
+        plot(T_out,log10(ER_lock2),'k-*','LineWidth',trait);
+
+    %     title('Evolution de l''erreur relative entre le primaire et le verrouillé','FontSize',texte);
+        title('Logarithmic evolution of the relative error','FontSize',texte);
+        xlabel('$t [AU]$','FontSize',texte,'Interpreter','Latex');
+        ylabel('$\mathcal{R}$','FontSize',texte,'Interpreter','Latex');
+
+        legend(['q = ',num2str(q1)],['q = ',num2str(q2)],...
+            'Location','SouthEast');
+
+        plot([T_lock T_lock],get(gca,'ylim'),'m','LineWidth',trait);
+        plot([T_libre T_libre],get(gca,'ylim'),'m','LineWidth',trait);
+
+        set(gca,'FontSize',texte);
+        axis tight;
+    else
+        plot(T_out(tMSE),log10(nrmse1),'g-*','LineWidth',trait); hold on;
+        plot(T_out(tMSE),log10(nrmse2),'k-*','LineWidth',trait);
+
+        title('Logarithmic evolution of the NRMSE','FontSize',texte);
+        xlabel('$t [AU]$','FontSize',texte,'Interpreter','Latex');
+        ylabel('$[AU]$','FontSize',texte,'Interpreter','Latex');
+
+        legend(['q = ',num2str(q1)],['q = ',num2str(q2)],...
+            'Location','SouthEast');
+
+        plot([T_lock T_lock],get(gca,'ylim'),'m','LineWidth',trait);
+        plot([T_libre T_libre],get(gca,'ylim'),'m','LineWidth',trait);
+
+        set(gca,'FontSize',texte); 
+        axis tight;
+    end
+
 set(figMGLockMG_compare,'visible','on')
