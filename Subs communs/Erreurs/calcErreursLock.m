@@ -29,7 +29,7 @@ subplot(211); hold on;
     plot(T_out,lock,'r-o','LineWidth',trait);
 %     plot(T_out,unlock,'k','LineWidth',trait);
 
-    title('Comparison of the evolution of the systemes','FontSize',texte);
+    title('Evolution of the systems','FontSize',texte);
     xlabel('$t [AU]$','FontSize',texte,'Interpreter','Latex');
     ylabel('$[AU]$','FontSize',texte,'Interpreter','Latex');
     
