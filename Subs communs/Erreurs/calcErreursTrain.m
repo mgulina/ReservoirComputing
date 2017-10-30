@@ -38,7 +38,8 @@ if ~fullTrain
             EA_libre{i} = abs(Cible(libreSeq(tMSE(i):tMSE(i+1))) - y_hat(libreSeq((tMSE(i)-theta):(tMSE(i+1)-theta)))');
             ER_libre{i} = EA_libre{i}./abs(Cible(libreSeq(tMSE(i):tMSE(i+1))));
             mse_libre(i) = sqrt(mean(EA_libre{i}.^2));
-            nrmse_libre(i) = mse_libre(i)/(max(Cible(libreSeq(tMSE(i):tMSE(i+1)))) - min(Cible(libreSeq(tMSE(i):tMSE(i+1)))));
+%             nrmse_libre(i) = mse_libre(i)/(max(Cible(libreSeq(tMSE(i):tMSE(i+1)))) - min(Cible(libreSeq(tMSE(i):tMSE(i+1)))));
+            nrmse_libre(i) = mse_libre(i)/var(Cible(libreSeq(tMSE(i):tMSE(i+1))));
         end
         log10_mse_libre = log10(mse_libre);
     end

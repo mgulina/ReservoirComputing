@@ -19,7 +19,8 @@ if calcMSE
         EA{i} = abs(primaire(tMSE(i):tMSE(i+1)) - lock(tMSE(i):tMSE(i+1)));
         ER{i} = EA{i}./abs(primaire(tMSE(i):tMSE(i+1)));
         mse(i) = sqrt(mean(EA{i}.^2));
-        nrmse(i) = mse(i)/(max(primaire(tMSE(i):tMSE(i+1))) - min(primaire(tMSE(i):tMSE(i+1))));
+%         nrmse(i) = mse(i)/(max(primaire(tMSE(i):tMSE(i+1))) - min(primaire(tMSE(i):tMSE(i+1))));
+        nrmse(i) = mse(i)/var(primaire(tMSE(i):tMSE(i+1)));
     end
 end
 
@@ -29,7 +30,7 @@ subplot(211); hold on;
     plot(T_out,lock,'r-o','LineWidth',trait);
 %     plot(T_out,unlock,'k','LineWidth',trait);
 
-    title('Comparison of the evolution of the systemes','FontSize',texte);
+    title('Evolution of the systems','FontSize',texte);
     xlabel('$t [AU]$','FontSize',texte,'Interpreter','Latex');
     ylabel('$[AU]$','FontSize',texte,'Interpreter','Latex');
     
