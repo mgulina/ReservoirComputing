@@ -4,7 +4,6 @@
 % Mélange non-linéaire en III/1
 % -----------------------------
 
-clearvars; 
 clc;
 % close all;
 
