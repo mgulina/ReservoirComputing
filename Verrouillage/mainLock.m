@@ -8,7 +8,7 @@
 clc; close all; clearvars; format short; 
 
 cas = menu('Choisissez le type de verrouillage',...
-                'MG-MG','MG-RC','RC-MG','RC-RC','L-L','RC-L','Compare q');
+                'MG-MG','MG-RC','RC-MG','RC-RC','L-L','L-RC','RC-L','Compare q');
 draplock = 1;
 pause(10^-1);
 
@@ -84,13 +84,17 @@ elseif cas == 4
 
 elseif cas == 5
     LoLockLo;
-    
+
 elseif cas == 6
+    mainPredictLorenz;
+    LoLockRC;
+    
+elseif cas == 7
     rk4 = 0;
     mainPredictLorenz;
     RCLockLo;
-
-elseif cas == 7
+    
+elseif cas == 8
     compare_q;
     
 else

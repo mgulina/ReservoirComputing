@@ -1,10 +1,10 @@
 % Verrouillage de deux systèmes de Lorenz (RC ou RK4) 
 % ***************************************************
 
-% RC sur Lorenz
+% Lorenz sur RC
 % -------------
 
-disp('Verrouillage RC sur Lorenz');
+disp('Verrouillage Lorenz sur RC');
 
 %% 1 - Initialisation
 %% 1.1 - Intervalle d'intégration
@@ -24,17 +24,15 @@ if ~exist('Message','var')
 end
 
 %% 1.2 - Récupération des données du RC
-if ~exist('doneRClockLo','var')
+if ~exist('doneLolockRC','var')
 % Etat final
 s = S(end,:);
-SLock = zeros(T,N+K); SLock(1,:) = s;
-SUnlock = SLock;
+S = zeros(T,N+K); S(1,:) = s;
 
-doneRClockLo = 0;
+doneLolockRC = 0;
 
 else
-    SLock = zeros(T,N+K); SLock(1,:) = s;
-    SUnlock = SLock;
+    S = zeros(T,N+K); S(1,:) = s;
 end
 
 % Fonction d'activtion
@@ -48,8 +46,8 @@ global sigma r b;
 sigma = 10; r = 28; b = 8/3;
 
 %% 1.4 - Conditions initiales des sytèmes primaire et secondaires
-primaire = [10 0 0 ; zeros(T-1,3)];
-unlock = [-10 ; zeros(T-1,1)];
+primaire = [10; zeros(T-1,1)];
+unlock = [-10 0 0 ; zeros(T-1,3)];
 
 %% 1.5 - Paramètres du verrouillage
 if ~exist('q','var')
@@ -57,42 +55,36 @@ if ~exist('q','var')
 end
 % p = 1-q;
 
-% lock3d = 1; % 0 : Verrouillage sur X ; 1 : Verrouillage sur X, Y et Z
-
 LvlNoiseVerrou = 0; % Niveau de Bruit
 
-lock = [unlock(1) ; zeros(T-2,1)];
+lock = [unlock(1,1) ; zeros(T-2,1)];
 
 %% 2 - verrouillage
 % hw = waitbar(0,'Calculs en cours. Veuillez patienter...');
 % set(findobj(hw,'type','patch'),'EdgeColor','k','FaceColor','b');
-for t = 1:T-1
-    %% 2.1 - Système primaire   
-    primaire(t+1,:) = Lorenz_rk4(h,primaire(t,:));
-end
-    primaire = primaire(:,1);
-
+    %% 2.1 - Système primaire 
+    for t = 1:T-1
+    primaire(t) = W_out*S(t,:)';
+        
+    S(t+1,:) = majRes(f_RC,delta,a,C,W_in,W,W_fb,S(t,1:N)',...
+                      u(:,t+1),primaire(t),unifrnd(-LvlNoiseRC,LvlNoiseRC,1,1)); 
+    end
+    primaire(T) = W_out*S(T,:)';
+    
 for t = 1:T-1
     %% 2.2 - Système secondaire sans verrouillage
-    unlock(t) = W_out*SUnlock(t,:)';    
-    SUnlock(t+1,:) = majRes(f_RC,delta,a,C,W_in,W,W_fb,SUnlock(t,1:N)',...
-                      u(:,t+1),unlock(t),unifrnd(-LvlNoiseRC,LvlNoiseRC,N,1)); 
+    unlock(t+1,:) = Lorenz_rk4(h,unlock(t,:)); 
     
     %% 2.3 - Système secondaire avec verrouillage
     if t < T_lock/h, p = 1; else p = 1-q; end
     if t > T_libre/h, p = 1; end
-    lock(t) = p*W_out*SLock(t,:)' +(1-p)*(primaire(t) ...
-              + unifrnd(-LvlNoiseVerrou,LvlNoiseVerrou,1,1));
-          
-    SLock(t+1,:) = majRes(f_RC,delta,a,C,W_in,W,W_fb,SLock(t,1:N)',...
-                      u(:,t+1),lock(t),unifrnd(-LvlNoiseRC,LvlNoiseRC,N,1));
-            
+        temp = Lorenz_rk4(h,[lock(t) unlock(t,2:3)]);
+        lock(t+1) = p*temp(1,1) ...
+                    + (1-p)*primaire(t+1,1) ...
+                    + LvlNoiseVerrou*unifrnd(-1,1);
+           
 %     waitbar(t/T,hw);
 end
-unlock(T) = W_out*SUnlock(T,:)';
-lock(T) = p*W_out*SLock(T,:)' +(1-p)*(primaire(T) ...
-              + unifrnd(-LvlNoiseVerrou,LvlNoiseVerrou,1,1));
-
 % close(hw)
 
 %% 3 - Calcul d'erreurs et affichage
@@ -105,4 +97,4 @@ calcErreursLock;
 
 set(figRCLockLo,'visible','on');
 
-doneRClockLo = 1;
+doneLolockRC = 1;

@@ -117,5 +117,3 @@ calcErreursLock;
 set(figRCLockMG,'visible','on');
 
 doneRClockMG = 1;
-
-clearvars S SLock SUnlock MG;

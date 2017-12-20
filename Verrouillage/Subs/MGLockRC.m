@@ -103,5 +103,3 @@ calcErreursLock;
 set(figMGLockRC,'visible','on');
 
 doneMGlockRC = 1;
-
-clearvars S MG;

@@ -98,5 +98,3 @@ calcErreursLock;
 set(figRCLockRC,'visible','on');
 
 doneRClockRC = 1;
-
-clearvars ER_libre MG;
