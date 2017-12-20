@@ -57,7 +57,7 @@ end
 
 LvlNoiseVerrou = 0; % Niveau de Bruit
 
-lock = [unlock(1,1) ; zeros(T-2,1)];
+lock = [unlock(1,:) ; zeros(T-2,3)];
 
 %% 2 - verrouillage
 % hw = waitbar(0,'Calculs en cours. Veuillez patienter...');
@@ -78,13 +78,13 @@ for t = 1:T-1
     %% 2.3 - Système secondaire avec verrouillage
     if t < T_lock/h, p = 1; else p = 1-q; end
     if t > T_libre/h, p = 1; end
-        temp = Lorenz_rk4(h,[lock(t) unlock(t,2:3)]);
-        lock(t+1) = p*temp(1,1) ...
-                    + (1-p)*primaire(t+1,1) ...
+        lock(t+1,:) = p*Lorenz_rk4(h,lock(t,:)) ...
+                    + (1-p)*primaire(t+1,:) ...
                     + LvlNoiseVerrou*unifrnd(-1,1);
            
 %     waitbar(t/T,hw);
 end
+lock = lock(:,1); % Supression des composantes y et z qui n'ont servis que pour intégrer
 % close(hw)
 
 %% 3 - Calcul d'erreurs et affichage
