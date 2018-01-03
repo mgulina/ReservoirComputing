@@ -9,11 +9,11 @@ clc;
 
 %% 1 - Construction du signal d'entrée
 disp('Construction du signal d''entrée');
-nbrFreqFini = menu('Choisissez la forme du message',...
+formeMessage = menu('Choisissez la forme du message',...
                 'Succession de sinus','Sinus à fréquence modulée',...
-                'Annuler');
+                'Chaîne de bits', 'Annuler');
 pause(0.1);            
-if nbrFreqFini == 1
+if formeMessage == 1
     nbrSinus = 5;
     omega = [0.01];
     h = 0.1;
@@ -32,7 +32,7 @@ if nbrFreqFini == 1
     T_out = [T_out_ex T_out_msg(2:end)];
     T = length(T_out);
     
-elseif nbrFreqFini == 2
+elseif formeMessage == 2
     B = 3;
     fc_ex = 5*10^-3;
     fm_ex = 5*10^-4;
@@ -53,7 +53,26 @@ elseif nbrFreqFini == 2
 
     T_out = [T_out_ex T_out_msg(2:end)];
     T = length(T_out);
-    
+
+    elseif formeMessage == 3
+        nbrBit = 80;
+        bitRepete = 100;
+        nbrBitsFinal = nbrBit*bitRepete;
+        h = 1; % h doit être unitaire 
+        
+        [Exemple,msgCache_ex,msgClair_ex] = genMessage(bitRepete,nbrBit);
+        [Message,msgCache_msg,msgClair_msg] = genMessage(bitRepete,nbrBit);
+        
+        T_ex = round(nbrBitsFinal/h);
+        T_out_ex = 0:h:nbrBitsFinal;
+        T_out_msg = nbrBitsFinal+h:h:2*nbrBitsFinal;
+        T_out = [T_out_ex T_out_msg(2:end)];
+        
+        T_tot = T_out_msg(end);
+        T = length(T_out);
+        
+        inputFactor = 0.01;
+        inputSignal = inputFactor*[Exemple ; Message];
 else
     error('La variable nbrFreqFini n''a pas été définie.');
 end
@@ -96,6 +115,10 @@ disp('Décryptage');
 [c,dot_c] = sortieMelange(alice,bob,h); % Construction de c et dot_c
 Decrypt = A_filtre*dot_c + c; % Récupération du message
 
+if formeMessage == 3
+    DecryptFiltre = filtreSortieBob(Decrypt,inputFactor,bitRepete);
+end
+
 %% 3 - Interception du signal par Eve 
 disp('Interception du signal par Eve');
 
@@ -103,7 +126,7 @@ disp('Interception du signal par Eve');
 % Exemple configuré au %% 1
 
 % Construction du réservoir
-if nbrFreqFini == 1
+if formeMessage == 1
     ChangeScaleMG = 0;
 %     N = 1500;
 %     gamma = 0.01;
@@ -162,26 +185,37 @@ disp('Décodage');
 [z,dot_z] = sortieMelange(alice,y_hat,h); % Construction de z et dot_z
 Decode = A_filtre*dot_z + z; % Décodage du message
 
+if formeMessage == 3
+    M = mean(Decode(150:end));
+%     M = inputFactor/2;
+    DecodeFiltre = filtreSortieEve(Decode,M,bitRepete);
+    DecodeFiltre(DecodeFiltre == 1) = inputFactor;
+end
+
 %% 4 - Transformées de Fourier
-[f_a,p_a] = tfPerso(T_out,alice);
-% p_a = p_a./max(p_a);
+if formeMessage ~= 3
+    [f_a,p_a] = tfPerso(T_out,alice);
+    % p_a = p_a./max(p_a);
 
-[f_input_ex,p_input_ex] = tfPerso(T_out(trainSeq),inputSignal(trainSeq));
-[f_input_msg,p_input_msg] = tfPerso(T_out(trainEnd+1:T),inputSignal(trainEnd+1:T));
+    [f_input_ex,p_input_ex] = tfPerso(T_out(trainSeq),inputSignal(trainSeq));
+    [f_input_msg,p_input_msg] = tfPerso(T_out(trainEnd+1:T),inputSignal(trainEnd+1:T));
 
-[f_Decrypt_ex,p_Decrypt_ex] = tfPerso(T_out(trainSeq),Decrypt(trainSeq));
-[f_Decrypt_msg,p_Decrypt_msg] = tfPerso(T_out(trainEnd+1:T),Decrypt(trainEnd+1:T));
+    [f_Decrypt_ex,p_Decrypt_ex] = tfPerso(T_out(trainSeq),Decrypt(trainSeq));
+    [f_Decrypt_msg,p_Decrypt_msg] = tfPerso(T_out(trainEnd+1:T),Decrypt(trainEnd+1:T));
 
-[f_Decode_ex,p_Decode_ex] = tfPerso(T_out(trainSeq),Decode(trainSeq));
-[f_Decode_msg,p_Decode_msg] = tfPerso(T_out(trainEnd+1:T),Decode(trainEnd+1:T));
+    [f_Decode_ex,p_Decode_ex] = tfPerso(T_out(trainSeq),Decode(trainSeq));
+    [f_Decode_msg,p_Decode_msg] = tfPerso(T_out(trainEnd+1:T),Decode(trainEnd+1:T));
+end
 
 %% 5 - Erreurs et sorties graphiques
-spectreAliceFig = figure('units','normalized',...
-        'outerposition',[0.05  0.1  0.9 0.9],...
-        'Name','Spectre du signal transmis',...
-        'Visible','On');
-    plot(f_a,p_a,'b-x');
-    xlim([0 1.2]);
-    xlabel('f [Hz]'); title('Spectre du signal transmis');   
-    
+if formeMessage ~= 3
+    spectreAliceFig = figure('units','normalized',...
+            'outerposition',[0.05  0.1  0.9 0.9],...
+            'Name','Spectre du signal transmis',...
+            'Visible','On');
+        plot(f_a,p_a,'b-x');
+        xlim([0 1.2]);
+        xlabel('f [Hz]'); title('Spectre du signal transmis');   
+end
+
 calcErreurMelange;
