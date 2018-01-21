@@ -11,15 +11,20 @@ clc;
 disp('Construction du signal d''entrée');
 formeMessage = menu('Choisissez la forme du message',...
                 'Succession de sinus','Sinus à fréquence modulée',...
-                'Chaîne de bits', 'Annuler');
-pause(0.1);            
-if formeMessage == 1
-    nbrSinus = 5;
-    omega = [0.01];
-    h = 0.1;
+                'Sinus à amplitude modulée','Chaîne de bits', 'Annuler');
+pause(0.1); 
 
-    [Exemple,T_out_ex] = genSinus('Fini',nbrSinus,omega,h);
-    [Message,T_out_msg] = genSinus('Fini',nbrSinus,omega,h);
+%% Succession de sinus
+if formeMessage == 1
+    nbrSinus = 8;           % Nombre de bits dans le cas où #omega = 2
+    omega = [0.01 0.04];
+    h = 0.1;
+    dt = 1/min(omega); % Sera multiplié par 2 pi
+
+    [Exemple,T_out_ex,omegaOut_ex,msgCache_ex,msgClair_ex] = ...
+        genSinus('Fini',nbrSinus,omega,h,dt*2*pi);
+    [Message,T_out_msg,omegaOut_msg,msgCache_msg,msgClair_msg] = ...
+        genSinus('Fini',nbrSinus,omega,h,dt*2*pi);
     
     T_ex = T_out_ex(end); T_msg = T_out_msg(end);
     T_out_msg = T_out_msg + T_ex;
@@ -32,6 +37,7 @@ if formeMessage == 1
     T_out = [T_out_ex T_out_msg(2:end)];
     T = length(T_out);
     
+ %% Sinus à fréquence modulée
 elseif formeMessage == 2
     B = 3;
     fc_ex = 5*10^-3;
@@ -54,7 +60,34 @@ elseif formeMessage == 2
     T_out = [T_out_ex T_out_msg(2:end)];
     T = length(T_out);
 
-    elseif formeMessage == 3
+%% Sinus à amplitude modulée
+elseif formeMessage == 3
+    error('a terminer éventuellement plus tard');
+%     nbrBit = 24;
+%     bitRepete = 200;
+%     nbrBitsFinal = nbrBit*bitRepete;
+%     
+%     omega = 2*pi/bitRepete;
+%     h = 1; % doit être unitaire
+% 
+%     [port,T_out] = genSinus('Fini',2*nbrBit+1,omega,h); % + 1 pour avoir assez de sinus
+%         
+%     [bits,~,~] = genMessage(bitRepete,2*nbrBit);
+%     
+%     T_ex = nbrBitsFinal;
+%     T = length(port) - rem(length(port),bitRepete);
+%     T_out = T_out(1:T);
+%     port = port(1:T);
+%     
+%     bitFactor = 0.1;
+%     inputFactor = 0.1;
+%     
+%     inputSignal = inputFactor*(port + bitFactor*bits);
+    
+    
+
+%% Chaîne de bits
+    elseif formeMessage == 4
         nbrBit = 80;
         bitRepete = 100;
         nbrBitsFinal = nbrBit*bitRepete;
@@ -115,7 +148,7 @@ disp('Décryptage');
 [c,dot_c] = sortieMelange(alice,bob,h); % Construction de c et dot_c
 Decrypt = A_filtre*dot_c + c; % Récupération du message
 
-if formeMessage == 3
+if formeMessage == 4
     DecryptFiltre = filtreSortieBob(Decrypt,inputFactor,bitRepete);
 end
 
@@ -138,7 +171,7 @@ if formeMessage == 1
 %     a = 0.9;
     LvlNoise = 10^-5;
     
-else 
+elseif formeMessage == 2
     ChangeScaleMG = 0;
 %     N = 1500;
 %     gamma = 0.01;
@@ -149,6 +182,30 @@ else
 %     C = 0.44;
 %     a = 0.9;
     LvlNoise = 10^-4;
+    
+elseif formeMessage == 3
+    ChangeScaleMG = 0;
+%     N = 1500;
+%     gamma = 0.01;
+    delta = h;
+    gainIn = 0.9;
+    gainFb = 0.8;
+%     rho = 0.79;
+%     C = 0.44;
+%     a = 0.9;
+    LvlNoise = 10^-4;
+    
+elseif formeMessage == 4
+    ChangeScaleMG = 0;
+%     N = 1500;
+%     gamma = 0.01;
+    delta = h;
+    gainIn = 0.9;
+    gainFb = 0.8;
+%     rho = 0.79;
+%     C = 0.44;
+%     a = 0.9;
+    LvlNoise = 10^-4;    
 end
 
 genResMG;
@@ -185,15 +242,15 @@ disp('Décodage');
 [z,dot_z] = sortieMelange(alice,y_hat,h); % Construction de z et dot_z
 Decode = A_filtre*dot_z + z; % Décodage du message
 
-if formeMessage == 3
-    M = mean(Decode(150:end));
+if formeMessage == 4
+    M = mean(Decode(nbrBitsFinal:end));
 %     M = inputFactor/2;
     DecodeFiltre = filtreSortieEve(Decode,M,bitRepete);
     DecodeFiltre(DecodeFiltre == 1) = inputFactor;
 end
 
 %% 4 - Transformées de Fourier
-if formeMessage ~= 3
+if formeMessage ~= 4
     [f_a,p_a] = tfPerso(T_out,alice);
     % p_a = p_a./max(p_a);
 
@@ -208,7 +265,7 @@ if formeMessage ~= 3
 end
 
 %% 5 - Erreurs et sorties graphiques
-if formeMessage ~= 3
+if formeMessage ~= 4
     spectreAliceFig = figure('units','normalized',...
             'outerposition',[0.05  0.1  0.9 0.9],...
             'Name','Spectre du signal transmis',...

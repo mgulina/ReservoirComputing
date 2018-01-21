@@ -5,7 +5,7 @@
 % --------------------------------
 
 %% 1 - Erreurs
-if formeMessage ~= 3
+if formeMessage == 1 || formeMessage == 2
     EA_Decrypt = abs(Decrypt-inputSignal);
     ER_Decrypt = 100*EA_Decrypt./abs(inputSignal);
     mse_Decrypt = mean(EA_Decrypt.^2);
@@ -36,7 +36,10 @@ if formeMessage ~= 3
     log10_mse_TF_Decode_ex = log10(mse_TF_Decode_ex)
     log10_mse_TF_Decode_msg = log10(mse_TF_Decode_msg)
     
-else
+elseif formeMessage == 3
+    error('a terminer éventuellement plus tard');
+    
+elseif formeMessage == 4
     EA_Decrypt = abs(DecryptFiltre-inputSignal);
     mse_Decrypt = mean(EA_Decrypt.^2);
 
@@ -46,14 +49,17 @@ else
 
     log10_mse_Decode_ex = log10(mse_Decode_ex) %#ok<*NOPTS>
     log10_mse_Decode_msg = log10(mse_Decode_msg)
-
+    
+    nbrErreurDecode = sum(abs(EA_Decode)/inputFactor)/(bitRepete) %#ok<*NOPTS>
+    SER = nbrErreurDecode/(nbrBit)
 end
+
 %% 3 - Sorties graphiques
 signalsFig = figure('units','normalized',...
         'outerposition',[0.05  0.1  0.9 0.9],...
         'Name','Résultats du décryptage et du décodage',...
         'Visible','Off');
-if formeMessage ~= 3  
+if formeMessage ~= 4
     subplot(4,1,1)
         plot(T_out,alice,'c-*'); hold on;
         plot(T_out,bob,'b-o');
@@ -151,4 +157,4 @@ else
 
 end
 
-% set(signalsFig,'Visible','on');
+set(signalsFig,'Visible','on');
