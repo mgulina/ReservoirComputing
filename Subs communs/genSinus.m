@@ -37,6 +37,22 @@ function [Message,T_out,varargout] = genSinus(meth,varargin)
         catch
             dt = 0;
         end
+        try
+            msgClair = varargin{5};
+            bits = dec2bin(varargin{5});
+            [p,q] = size(bits); N = p*q;
+            
+            if rem(N,7) ~= 0 || N < 0
+                    error('Le nombre de bits doit être un multiple positif de 7.');
+            end
+
+            msgCache = bits;
+            drapMsg = 1;
+
+        catch 
+            drapMsg = 0;
+        end
+        
                 
         if h > 1
             error('Le pas doit être inférieur ou égal à 1.'); 
@@ -49,8 +65,8 @@ function [Message,T_out,varargout] = genSinus(meth,varargin)
                     
         if dt == 0 % pas d'intervalle de temps : on fait une période par pulsation
             if L == 2
-                if rem(N,8) ~= 0 || N < 0
-                    error('Le nombre de bits doit être un multiple positif de 8.');
+                if rem(N,7) ~= 0 || N < 0
+                    error('Le nombre de bits doit être un multiple positif de 7.');
                 end
                 bits = zeros(N,1);
                 
@@ -81,21 +97,37 @@ function [Message,T_out,varargout] = genSinus(meth,varargin)
         else
             T = dt;
             if L == 2
-                if rem(N,8) ~= 0 || N < 0
-                    error('Le nombre de bits doit être un multiple positif de 8.');
+                if rem(N,7) ~= 0 || N < 0
+                    error('Le nombre de bits doit être un multiple positif de 7.');
                 end
-                bits = zeros(N,1);
-                for i = 1:N
-                    w = omegaIn(randi(L));
-                    omegaOut(i) = w;
-                        if w == omegaIn(2)
-                            bits(i) = 1;
-%                         else 
-%                             bits(i) = 0;
-                        end
-                    n = length(h:h:T);
-                    Message = [Message  sin(w*(linspace(h,T,n)))];
-                    T_out = [T_out (h:h:T)+T_out(end)];
+                if ~exist('bits','var')
+                    bits = zeros(N,1);
+                    for i = 1:N
+                        w = omegaIn(randi(L));
+                        omegaOut(i) = w;
+                            if w == omegaIn(2)
+                                bits(i) = 1;
+%                             else 
+%                                 bits(i) = 0;
+                            end
+                        n = length(h:h:T);
+                        Message = [Message  sin(w*(linspace(h,T,n)))];
+                        T_out = [T_out (h:h:T)+T_out(end)];
+                    end
+                else
+                    
+                    for i = 1:N   
+                            if strcmp(bits(i),'1')
+                                w = omegaIn(2);
+                                omegaOut(i) = w;
+                            else 
+                                w = omegaIn(1);
+                                omegaOut(i) = w;
+                            end
+                        n = length(h:h:T);
+                        Message = [Message  sin(w*(linspace(h,T,n)))];
+                        T_out = [T_out (h:h:T)+T_out(end)];
+                    end
                 end
             
             else
@@ -111,17 +143,19 @@ function [Message,T_out,varargout] = genSinus(meth,varargin)
         Message = Message';
         if L ~= 2
             varargout = {omegaOut};
-        else
+        elseif drapMsg == 0
             j = 1;
-            for i = 1:N/8
-                msgCache(i,1:8) = bits(j:j+7);
-                j = j+8;
+            for i = 1:N/7
+                msgCache(i,1:7) = bits(j:j+6);
+                j = j+7;
             end
 
-            for i = 1:N/8
+            for i = 1:N/7
                 msgClair(i) = bin2dec(num2str(msgCache(i,:)));
             end
             msgClair = char(msgClair);
+            varargout = {omegaOut, msgCache, msgClair};
+        else
             varargout = {omegaOut, msgCache, msgClair};
         end
         

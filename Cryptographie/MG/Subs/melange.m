@@ -16,15 +16,15 @@ pause(0.1);
 
 %% Succession de sinus
 if formeMessage == 1
-    nbrSinus = 8;           % Nombre de bits dans le cas où #omega = 2
+    nbrSinus = 7;           % Nombre de bits dans le cas où #omega = 2 (si pas de message entré dans genSin)
     omega = [0.01 0.04];
     h = 0.1;
     dt = 1/min(omega); % Sera multiplié par 2 pi
 
     [Exemple,T_out_ex,omegaOut_ex,msgCache_ex,msgClair_ex] = ...
-        genSinus('Fini',nbrSinus,omega,h,dt*2*pi);
+        genSinus('Fini',nbrSinus,omega,h,dt*2*pi,'a');
     [Message,T_out_msg,omegaOut_msg,msgCache_msg,msgClair_msg] = ...
-        genSinus('Fini',nbrSinus,omega,h,dt*2*pi);
+        genSinus('Fini',nbrSinus,omega,h,dt*2*pi,'hello');
     
     T_ex = T_out_ex(end); T_msg = T_out_msg(end);
     T_out_msg = T_out_msg + T_ex;
