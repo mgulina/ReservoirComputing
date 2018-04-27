@@ -32,9 +32,9 @@ figCrack = figure('units','normalized',...
         'Visible','Off');
     
 subplot(211);
-    plot(T_out,Message,'b-o','LineWidth',trait);hold on;
-    plot(T_out,Crack,'r-x','LineWidth',trait);
-    plot(T_out,CrackFiltre,'g-*','LineWidth',trait);
+    plot(T_out,Message,'b','LineWidth',trait);hold on;
+    plot(T_out,Crack,'r','LineWidth',trait);
+    plot(T_out,CrackFiltre,'g','LineWidth',trait);
     plot([0 T_out(end)],[M M],'k','LineWidth',trait);
     xlabel('$t [s]$','FontSize',texte,'Interpreter','Latex');
     ylabel('$[AU]$','FontSize',texte,'Interpreter','Latex');
@@ -46,7 +46,7 @@ subplot(211);
    set(gca,'FontSize',texte);
     
 subplot(212);    
-    plot(T_out,ErreurCrackFiltre,'g-*','LineWidth',trait);
+    plot(T_out,ErreurCrackFiltre,'g','LineWidth',trait);
     xlabel('$t [s]$','FontSize',texte,'Interpreter','Latex');
     ylabel('$[AU]$','FontSize',texte,'Interpreter','Latex');
     title('Différence entre le message original et decodé',...

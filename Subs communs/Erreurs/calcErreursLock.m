@@ -27,8 +27,8 @@ end
 
 %% 2 - Affichage
 subplot(211); hold on;
-    plot(T_out,primaire,'b-x','LineWidth',trait); 
-    plot(T_out,lock,'r-o','LineWidth',trait);
+    plot(T_out,primaire,'b-.','LineWidth',trait); 
+    plot(T_out,lock,'r-.','LineWidth',trait);
 %     plot(T_out,unlock,'k','LineWidth',trait);
 
     title('Evolution of the systems','FontSize',texte);
@@ -47,7 +47,7 @@ subplot(211); hold on;
 
 subplot(212); hold on;
     if ~calcMSE
-        plot(T_out,log10(ER_lock),'g-*','LineWidth',trait); hold on;
+        plot(T_out,log10(ER_lock),'g','LineWidth',trait); hold on;
     %     plot(T_out,EA_lock,'b-*','LineWidth',trait);
     
     %     title('Evolution de l''erreur relative entre le primaire et le verrouillé','FontSize',texte);
@@ -64,7 +64,7 @@ subplot(212); hold on;
         set(gca,'FontSize',texte);
         axis tight;
     else
-        plot(T_out(tMSE),log10(nrmse),'g-*','LineWidth',trait); hold on;
+        plot(T_out(tMSE),log10(nrmse),'g','LineWidth',trait); hold on;
         
         title('Logarithmic evolution of the NRMSE','FontSize',texte);
         xlabel('$t [AU]$','FontSize',texte,'Interpreter','Latex');

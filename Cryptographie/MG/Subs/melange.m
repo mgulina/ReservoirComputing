@@ -270,7 +270,7 @@ if formeMessage ~= 4
             'outerposition',[0.05  0.1  0.9 0.9],...
             'Name','Spectre du signal transmis',...
             'Visible','On');
-        plot(f_a,p_a,'b-x');
+        plot(f_a,p_a,'b-.');
         xlim([0 1.2]);
         xlabel('f [Hz]'); title('Spectre du signal transmis');   
 end

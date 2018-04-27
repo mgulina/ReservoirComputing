@@ -18,9 +18,9 @@ figDecrypt = figure('units','normalized',...
         'Visible','Off');
     
 subplot(211);
-    plot(T_out,Message,'b-o','LineWidth',trait);hold on;
-    plot(T_out,Decrypt,'r-x','LineWidth',trait);
-    plot(T_out,DecryptFiltre,'g-*','LineWidth',trait);
+    plot(T_out,Message,'b','LineWidth',trait);hold on;
+    plot(T_out,Decrypt,'r','LineWidth',trait);
+    plot(T_out,DecryptFiltre,'g','LineWidth',trait);
     plot([0 T_out(end)],[A/2 A/2],'k','LineWidth',trait);
     xlabel('$t [s]$','FontSize',texte,'Interpreter','Latex');
     ylabel('$[AU]$','FontSize',texte,'Interpreter','Latex');
@@ -36,7 +36,7 @@ subplot(211);
    set(gca,'FontSize',texte);
     
 subplot(212);    
-    plot(T_out,ErreurDecryptFiltre,'g-*','LineWidth',trait);
+    plot(T_out,ErreurDecryptFiltre,'g','LineWidth',trait);
     xlabel('$t [s]$','FontSize',texte,'Interpreter','Latex');
     ylabel('$[AU]$','FontSize',texte,'Interpreter','Latex');
     title('Différence entre le message original et décrypté',...

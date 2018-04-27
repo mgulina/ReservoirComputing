@@ -56,8 +56,8 @@ if fullTrain
 else
     subplot(221);
 end
-    plot(T_out(trainSeq),Cible(trainSeq),'b-o','LineWidth',trait); hold on; 
-    plot(T_out(trainSeq),y_hat(trainSeq),'r-x','LineWidth',trait);
+    plot(T_out(trainSeq),Cible(trainSeq),'b-.','LineWidth',trait); hold on; 
+    plot(T_out(trainSeq),y_hat(trainSeq),'r-.','LineWidth',trait);
     title('Comparaison entre fonction cible (bleu) et entraînée (rouge)',...
         'FontSize',texte);
 %     legend('Fonction cible','Fonction entraînée','Location','Best');
@@ -68,8 +68,8 @@ end
     
 if ~fullTrain    
 subplot(222);
-    plot(T_out(libreSeq),Cible(libreSeq)','b-o','LineWidth',trait); hold on;
-    plot(T_out(libreSeq), y_hat(libreSeq),'r-x','LineWidth',trait);
+    plot(T_out(libreSeq),Cible(libreSeq)','b-.','LineWidth',trait); hold on;
+    plot(T_out(libreSeq), y_hat(libreSeq),'r-.','LineWidth',trait);
     title('Comparaison entre fonction cible (bleu) et prédite (rouge)',...
         'FontSize',texte);
 %     legend('Fonction cible','Fonction prédite','Location','Best');
