@@ -118,7 +118,7 @@ function [Message,T_out,varargout] = genSinus(meth,varargin)
                     
                     for i = 1:N   
                             if strcmp(bits(i),'1')
-                                w = omegaIn(2);
+                                w = omegaIn(end);
                                 omegaOut(i) = w;
                             else 
                                 w = omegaIn(1);

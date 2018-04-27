@@ -4,9 +4,10 @@ ER_lock = EA_lock./abs(primaire);
   
 % On calcule la MSE à partir du premier minimum de l'erreur absolue
 T_locked = find(EA_lock == min(EA_lock),1);
-lockSeq = T_locked:T;
-mse_lock = mean(EA_lock(lockSeq).^2);
+T_unlocked = round(T_libre/h);
+lockSeq = T_locked:T_unlocked;
 
+mse_lock = mean(EA_lock(lockSeq).^2) %#ok<*NOPTS>
 log10_mse_lock = log10(mse_lock) %#ok<*NOPTS>
 
 if calcMSE
