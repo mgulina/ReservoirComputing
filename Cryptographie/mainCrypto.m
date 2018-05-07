@@ -36,6 +36,7 @@ if cas == 1
 elseif cas == 2
     melange;
     set(signalsFig,'Visible','on');
+%     set(spectreAliceFig,'Visible','on');
     
 elseif cas == 3
     superpositionLorenz;

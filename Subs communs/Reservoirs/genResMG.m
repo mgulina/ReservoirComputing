@@ -51,3 +51,5 @@ if ~exist('LvlNoise','var')
 end
 ridge = 0; % Méthode d'inversion de la matrice de corrélation
 f_RC = 'tanh'; % Fonction du réservoir
+
+esn_check = abs(1 - delta*C*(a - rho));

@@ -12,7 +12,9 @@ disp('Construction du signal d''entrée');
 formeMessage = menu('Choisissez la forme du message',...
                 'Succession de sinus','Sinus à fréquence modulée',...
                 'Sinus à amplitude modulée','Chaîne de bits', 'Annuler');
-pause(0.1); 
+pause(0.1);
+
+fullAttack = 0;
 
 %% Succession de sinus
 if formeMessage == 1
@@ -30,7 +32,7 @@ if formeMessage == 1
     T_out_msg = T_out_msg + T_ex;
     T_tot = T_ex + T_msg;
 
-    inputFactor = 0.05;
+    inputFactor = 0.01;
     
     inputSignal = inputFactor*[Exemple ; Message(2:end)];
 
@@ -171,17 +173,23 @@ if formeMessage == 1
 %     a = 0.9;
     LvlNoise = 10^-5;
     
-elseif formeMessage == 2
+elseif formeMessage == 2    
     ChangeScaleMG = 0;
 %     N = 1500;
 %     gamma = 0.01;
     delta = h;
     gainIn = 0.9;
-    gainFb = 0.8;
 %     rho = 0.79;
-%     C = 0.44;
 %     a = 0.9;
     LvlNoise = 10^-4;
+    
+    if fullAttack
+        C = 0.44; %#ok<*UNRCH>
+        gainFb = 0.8;
+    else
+        C = 0.05;
+        gainFb = 0;
+    end
     
 elseif formeMessage == 3
     ChangeScaleMG = 0;
@@ -213,7 +221,11 @@ genResMG;
 fullTrain = 1;      transient = 1000;       trainEnd = round((T_ex)/h);
 
 % Signal d'apprentissage
-tmp = T;        u = alice';     Cible = bob(1:trainEnd);
+if fullAttack
+    tmp = T;        u = alice';     Cible = bob(1:trainEnd);
+else
+    tmp = T;        u = alice';     Cible = inputSignal(1:trainEnd);
+end
 T = trainEnd; %#ok<NASGU>
 
 % Entraînement
@@ -239,14 +251,18 @@ y_hat(T) = W_out*S(T,:)';
 
 %% 3.3 - Traitement du signal de sortie et décodage
 disp('Décodage');
-[z,dot_z] = sortieMelange(alice,y_hat,h); % Construction de z et dot_z
-Decode = A_filtre*dot_z + z; % Décodage du message
-
-if formeMessage == 4
-    M = mean(Decode(nbrBitsFinal:end));
-%     M = inputFactor/2;
-    DecodeFiltre = filtreSortieEve(Decode,M,bitRepete);
-    DecodeFiltre(DecodeFiltre == 1) = inputFactor;
+if fullAttack
+    [z,dot_z] = sortieMelange(alice,y_hat,h); % Construction de z et dot_z
+    Decode = A_filtre*dot_z + z; % Décodage du message
+    
+    if formeMessage == 4
+        M = mean(Decode(nbrBitsFinal:end));
+%         M = inputFactor/2;
+        DecodeFiltre = filtreSortieEve(Decode,M,bitRepete);
+        DecodeFiltre(DecodeFiltre == 1) = inputFactor;
+    end
+else
+    Decode = y_hat';
 end
 
 %% 4 - Transformées de Fourier
@@ -269,7 +285,7 @@ if formeMessage ~= 4
     spectreAliceFig = figure('units','normalized',...
             'outerposition',[0.05  0.1  0.9 0.9],...
             'Name','Spectre du signal transmis',...
-            'Visible','On');
+            'Visible','Off');
         plot(f_a,p_a,'b-.');
         xlim([0 1.2]);
         xlabel('f [Hz]'); title('Spectre du signal transmis');   
