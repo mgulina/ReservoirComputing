@@ -90,8 +90,8 @@ elseif formeMessage == 3
 
 %% Chaîne de bits
     elseif formeMessage == 4
-        nbrBit = 80;
-        bitRepete = 100;
+        nbrBit = 320;
+        bitRepete = 50;
         nbrBitsFinal = nbrBit*bitRepete;
         h = 1; % h doit être unitaire 
         
@@ -238,7 +238,7 @@ trainSimpleMG;
 calcErreursTrain;
 
 %% 3.2 - Décodage
-disp('Emulation du signal de Bob');
+disp('Emulation par le réservoir');
 
 T = tmp;
 
