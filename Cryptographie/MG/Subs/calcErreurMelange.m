@@ -9,32 +9,40 @@ if formeMessage == 1 || formeMessage == 2
     EA_Decrypt = abs(Decrypt-inputSignal);
     ER_Decrypt = 100*EA_Decrypt./abs(inputSignal);
     mse_Decrypt = mean(EA_Decrypt.^2);
+    nmse_Decrypt = mse_Decrypt/mean((inputSignal - mean(inputSignal)).^2)
 
     EA_Decode = abs(Decode-inputSignal);
     ER_Decode = 100*EA_Decode./abs(inputSignal);
     mse_Decode_ex = mean(EA_Decode(trainSeq).^2);
     mse_Decode_msg = mean(EA_Decode(trainEnd+1:T).^2);
+    nmse_Decode_ex = mse_Decode_ex/mean((inputSignal(trainSeq) - mean(inputSignal(trainSeq))).^2)
+    nmse_Decode_msg = mse_Decode_msg/mean((inputSignal(trainEnd+1:T) - mean(inputSignal(trainEnd+1:T))).^2)
+    
 
     EA_TF_Decrypt_ex = abs(p_Decrypt_ex-p_input_ex);
     ER_TF_Decrypt_ex = 100*EA_TF_Decrypt_ex./abs(p_input_ex);
     mse_TF_Decrypt_ex = mean(EA_TF_Decrypt_ex.^2);
+    nmse_TF_Decrypt_ex = mse_TF_Decrypt_ex/mean((p_input_ex - mean(p_input_ex)).^2)
 
     EA_TF_Decrypt_msg = abs(p_Decrypt_msg-p_input_msg);
     ER_TF_Decrypt_msg = 100*EA_TF_Decrypt_msg./abs(p_input_msg);
     mse_TF_Decrypt_msg = mean(EA_TF_Decrypt_msg.^2);
+    nmse_TF_Decrypt_msg = mse_TF_Decrypt_msg/mean((p_input_msg - mean(p_input_msg)).^2)
 
     EA_TF_Decode_ex = abs(p_Decode_ex-p_input_ex);
     ER_TF_Decode_ex = 100*EA_TF_Decode_ex./abs(p_input_ex);
     mse_TF_Decode_ex = mean(EA_TF_Decode_ex.^2);
+    nmse_TF_Decode_ex = mse_TF_Decode_ex/mean((p_input_ex - mean(p_input_ex)).^2)
 
     EA_TF_Decode_msg = abs(p_Decode_msg-p_input_msg);
     ER_TF_Decode_msg = 100*EA_TF_Decode_msg./abs(p_input_msg);
     mse_TF_Decode_msg = mean(EA_TF_Decode_msg.^2);
+    nmse_TF_Decode_msg = mse_TF_Decode_msg/mean((p_input_msg - mean(p_input_msg)).^2)
 
-    log10_mse_Decode_ex = log10(mse_Decode_ex) %#ok<*NOPTS>
-    log10_mse_Decode_msg = log10(mse_Decode_msg)
-    log10_mse_TF_Decode_ex = log10(mse_TF_Decode_ex)
-    log10_mse_TF_Decode_msg = log10(mse_TF_Decode_msg)
+    log10_nmse_Decode_ex = log10(nmse_Decode_ex) %#ok<*NOPTS>
+    log10_nmse_Decode_msg = log10(nmse_Decode_msg)
+    log10_nmse_TF_Decode_ex = log10(nmse_TF_Decode_ex)
+    log10_nmse_TF_Decode_msg = log10(nmse_TF_Decode_msg)
     
 elseif formeMessage == 3
     error('a terminer éventuellement plus tard');
@@ -42,13 +50,17 @@ elseif formeMessage == 3
 elseif formeMessage == 4
     EA_Decrypt = abs(DecryptFiltre-inputSignal);
     mse_Decrypt = mean(EA_Decrypt.^2);
+    nmse_Decrypt = mse_Decrypt/mean((inputSignal - mean(inputSignal)).^2)
 
     EA_Decode = abs(DecodeFiltre-inputSignal);
     mse_Decode_ex = mean(EA_Decode(trainSeq).^2);
     mse_Decode_msg = mean(EA_Decode(trainEnd+1:T).^2);
+    nmse_Decode_ex = mse_Decode_ex/mean((inputSignal(trainSeq) - mean(inputSignal(trainSeq))).^2)
+    nmse_Decode_msg = mse_Decode_msg/mean((inputSignal(trainEnd+1:T) - mean(inputSignal(trainEnd+1:T))).^2)
+    
 
-    log10_mse_Decode_ex = log10(mse_Decode_ex) %#ok<*NOPTS>
-    log10_mse_Decode_msg = log10(mse_Decode_msg)
+    log10_nmse_Decode_ex = log10(nmse_Decode_ex) %#ok<*NOPTS>
+    log10_nmse_Decode_msg = log10(nmse_Decode_msg)
     
     nbrErreurDecode = sum(abs(EA_Decode)/inputFactor)/(bitRepete) %#ok<*NOPTS>
     SER = nbrErreurDecode/(nbrBit)
@@ -65,9 +77,13 @@ if formeMessage ~= 4
         plot(T_out,bob,'b-.');
         plot(T_out,y_hat(1:length(T_out)),'r-.');
         plot(T_out,alice-bob,'k-.');
-        plot(T_out,z,'y-.'); 
+        if fullAttack
+            plot(T_out,z,'y-.');
+            legend('a','b','y','a-b','a-y','Location','NorthEast');
+        else
+            legend('a','b','y','a-b','Location','NorthEast');
+        end
 
-        legend('a','b','y','a-b','a-y','Location','NorthEast');
         xlabel('t [s]');
 
         plot([T_out(trainEnd) T_out(trainEnd)],get(gca,'YLim'),...

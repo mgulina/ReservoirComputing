@@ -8,21 +8,26 @@ T_unlocked = round(T_libre/h);
 lockSeq = T_locked:T_unlocked;
 
 mse_lock = mean(EA_lock(lockSeq).^2) %#ok<*NOPTS>
-log10_mse_lock = log10(mse_lock) %#ok<*NOPTS>
+nmse_lock = mse_lock/mean((primaire - mean(primaire)).^2);
+log10_nmse_lock = log10(nmse_lock)
 
 if calcMSE
     tMSE = 1:nMSE:T;
     EA = cell(length(tMSE),1);
     ER = cell(length(tMSE),1);
     mse = zeros(length(tMSE),1);
-    nrmse = zeros(length(tMSE),1); 
+%   rmse = zeros(length(tMSE),1);    
+    nmse = zeros(length(tMSE),1); 
     for i = 1:length(tMSE)-1
         EA{i} = abs(primaire(tMSE(i):tMSE(i+1)) - lock(tMSE(i):tMSE(i+1)));
         ER{i} = EA{i}./abs(primaire(tMSE(i):tMSE(i+1)));
-        mse(i) = sqrt(mean(EA{i}.^2));
+        mse(i) = mean(EA{i}.^2);
+%         rmse(i) = sqrt(mse(i));
 %         nrmse(i) = mse(i)/(max(primaire(tMSE(i):tMSE(i+1))) - min(primaire(tMSE(i):tMSE(i+1))));
-        nrmse(i) = mse(i)/var(primaire(tMSE(i):tMSE(i+1)));
+%         nrmse(i) = mse(i)/var(primaire(tMSE(i):tMSE(i+1)));
+        nmse(i) = mse(i)/mean((primaire(tMSE(i):tMSE(i+1)) - mean(primaire(tMSE(i):tMSE(i+1)))).^2);
     end
+    log10_nmse = log10(nmse)
 end
 
 %% 2 - Affichage
@@ -64,9 +69,9 @@ subplot(212); hold on;
         set(gca,'FontSize',texte);
         axis tight;
     else
-        plot(T_out(tMSE),log10(nrmse),'g','LineWidth',trait); hold on;
+        plot(T_out(tMSE),log10(nmse),'g','LineWidth',trait); hold on;
         
-        title('Logarithmic evolution of the NRMSE','FontSize',texte);
+        title('Logarithmic evolution of the NMSE','FontSize',texte);
         xlabel('$t [AU]$','FontSize',texte,'Interpreter','Latex');
         ylabel('$[AU]$','FontSize',texte,'Interpreter','Latex');
         

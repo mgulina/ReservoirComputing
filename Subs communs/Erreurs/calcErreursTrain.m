@@ -16,32 +16,37 @@ end
 EA_train = abs(Cible(trainSeq+theta) - y_hat(trainSeq)');
 ER_train = 100*EA_train./abs(Cible(trainSeq+theta));
 mse_train = mean(EA_train.^2);
-log10_mse_train = log10(mse_train) %#ok<*NOPTS>
+nmse_train = mse_train/mean((Cible(trainSeq+theta) - mean(Cible(trainSeq+theta))).^2)
+log10_nmse_train = log10(nmse_train) %#ok<*NOPTS>
 
 if ~fullTrain
     if ~calcMSE
         EA_libre = abs(Cible(libreSeq(1+theta:T-trainEnd)) - y_hat(libreSeq(1:T-trainEnd-theta))');
         ER_libre = EA_libre./abs(Cible(libreSeq(1+theta:T-trainEnd)));
-        mse_libre = sqrt(mean(EA_libre.^2));
+        mse_libre = mean(EA_libre.^2);
+        nmse_libre = mse_libre/mean((Cible(libreSeq(1+theta:T-trainEnd)) - mean(Cible(libreSeq(1+theta:T-trainEnd)))).^2)
 
-        nrmse84 = sqrt((Cible(test84+theta) - y_hat(test84)).^2 / var(Cible) );
+%         nrmse84 = sqrt((Cible(test84+theta) - y_hat(test84)).^2 / var(Cible) );
 
-        log10_mse_libre = log10(mse_libre)
-        log10_nrmse84 = log10(nrmse84)
+        log10_nmse_libre = log10(nmse_libre)
+%         log10_nrmse84 = log10(nrmse84)
     else
         tMSE = 1+theta:nMSE:T-trainEnd;
         EA_libre = cell(length(tMSE),1);
         ER_libre = cell(length(tMSE),1);
         mse_libre = zeros(length(tMSE),1);
-        nrmse_libre = zeros(length(tMSE),1); 
+%         rmse_libre = zeros(length(tMSE),1);
+        nmse_libre = zeros(length(tMSE),1); 
         for i = 1:length(tMSE)-1
             EA_libre{i} = abs(Cible(libreSeq(tMSE(i):tMSE(i+1))) - y_hat(libreSeq((tMSE(i)-theta):(tMSE(i+1)-theta)))');
             ER_libre{i} = EA_libre{i}./abs(Cible(libreSeq(tMSE(i):tMSE(i+1))));
-            mse_libre(i) = sqrt(mean(EA_libre{i}.^2));
-%             nrmse_libre(i) = mse_libre(i)/(max(Cible(libreSeq(tMSE(i):tMSE(i+1)))) - min(Cible(libreSeq(tMSE(i):tMSE(i+1)))));
-            nrmse_libre(i) = mse_libre(i)/var(Cible(libreSeq(tMSE(i):tMSE(i+1))));
+            mse_libre(i) = mean(EA_libre{i}.^2);
+%             rmse_libre(i) = sqrt(mse_libre(i));
+%             nrmse_libre(i) = rmse_libre(i)/(max(Cible(libreSeq(tMSE(i):tMSE(i+1)))) - min(Cible(libreSeq(tMSE(i):tMSE(i+1)))));
+%             nrmse_libre(i) = rmse_libre(i)/var(Cible(libreSeq(tMSE(i):tMSE(i+1))));
+            nmse_libre(i) = mse_libre(i)/mean((Cible(libreSeq(tMSE(i):tMSE(i+1))) - mean(Cible(libreSeq(tMSE(i):tMSE(i+1))))).^2);
         end
-        log10_mse_libre = log10(mse_libre);
+        log10_nmse_libre = log10(nmse_libre)
     end
 end
 
@@ -109,7 +114,7 @@ if ~fullTrain
     else
         subplot(224);
         plot(T_out(libreSeq(tMSE)), log10(mse_libre),'g','LineWidth',trait); hold on;
-        title('NRMSE pendant l''évolution libre',...
+        title('NMSE pendant l''évolution libre',...
             'FontSize',texte);
         xlabel('$t [s]$','FontSize',texte,'Interpreter','Latex');
 %         xlim(T_out([trainEnd T]));
