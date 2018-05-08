@@ -139,9 +139,12 @@ else
         plot(T_out,bob,'b-.');
         plot(T_out,y_hat(1:length(T_out)),'r-.');
         plot(T_out,alice-bob,'k-.');
-        plot(T_out,z,'y-.'); 
-
-        legend('a','b','y','a-b','a-y','Location','NorthEast');
+        if fullAttack
+            plot(T_out,z,'y-.');
+            legend('a','b','y','a-b','a-y','Location','NorthEast');
+        else
+            legend('a','b','y','a-b','Location','NorthEast');
+        end
         xlabel('t [s]');
 
         plot([T_out(trainEnd) T_out(trainEnd)],get(gca,'YLim'),...

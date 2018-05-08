@@ -209,11 +209,16 @@ elseif formeMessage == 4
 %     gamma = 0.01;
     delta = h;
     gainIn = 0.9;
-    gainFb = 0.8;
 %     rho = 0.79;
-%     C = 0.44;
 %     a = 0.9;
-    LvlNoise = 10^-4;    
+    LvlNoise = 10^-4;
+    if fullAttack
+        C = 0.44; %#ok<*UNRCH>
+        gainFb = 0.8;
+    else
+        C = 0.44;
+        gainFb = 0;
+    end
 end
 
 genResMG;
@@ -254,15 +259,15 @@ disp('Décodage');
 if fullAttack
     [z,dot_z] = sortieMelange(alice,y_hat,h); % Construction de z et dot_z
     Decode = A_filtre*dot_z + z; % Décodage du message
-    
-    if formeMessage == 4
-        M = mean(Decode(nbrBitsFinal:end));
-%         M = inputFactor/2;
-        DecodeFiltre = filtreSortieEve(Decode,M,bitRepete);
-        DecodeFiltre(DecodeFiltre == 1) = inputFactor;
-    end
 else
     Decode = y_hat';
+end
+
+if formeMessage == 4
+    M = mean(Decode(nbrBitsFinal:end));
+%         M = inputFactor/2;
+    DecodeFiltre = filtreSortieEve(Decode,M,bitRepete);
+    DecodeFiltre(DecodeFiltre == 1) = inputFactor;
 end
 
 %% 4 - Transformées de Fourier
