@@ -163,7 +163,7 @@ disp('Interception du signal par Eve');
 % Construction du réservoir
 if formeMessage == 1
     ChangeScaleMG = 0;
-%     N = 1500;
+     N = 250;
 %     gamma = 0.01;
     delta = h;
     gainIn = 0.9;
@@ -175,7 +175,7 @@ if formeMessage == 1
     
 elseif formeMessage == 2    
     ChangeScaleMG = 0;
-%     N = 1500;
+     N = 250;
 %     gamma = 0.01;
     delta = h;
     gainIn = 0.9;

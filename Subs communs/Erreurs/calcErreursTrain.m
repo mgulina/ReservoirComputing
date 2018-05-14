@@ -12,6 +12,10 @@ if ~exist('theta','var')
     theta = 0;
 end
 
+if ~exist('calcMSE','var')
+    calcMSE = 0;
+end
+
 %% 1 - Erreurs
 EA_train = abs(Cible(trainSeq+theta) - y_hat(trainSeq)');
 ER_train = 100*EA_train./abs(Cible(trainSeq+theta));
