@@ -171,7 +171,7 @@ if formeMessage == 1
 %     rho = 0.79;
 %     C = 0.44;
 %     a = 0.9;
-    LvlNoise = 10^-5;
+%     LvlNoise = 10^-5;
     
 elseif formeMessage == 2    
     ChangeScaleMG = 0;
@@ -181,7 +181,7 @@ elseif formeMessage == 2
     gainIn = 0.9;
 %     rho = 0.79;
 %     a = 0.9;
-    LvlNoise = 10^-4;
+%     LvlNoise = 10^-4;
     
     if fullAttack
         C = 0.44; %#ok<*UNRCH>
@@ -227,9 +227,13 @@ fullTrain = 1;      transient = 1000;       trainEnd = round((T_ex)/h);
 
 % Signal d'apprentissage
 if fullAttack
-    tmp = T;        u = alice';     Cible = bob(1:trainEnd);
+    tmp = T;
+    u = alice' + A_eps*unifrnd(-1,1,size(alice'));
+    Cible = bob(1:trainEnd) + A_eps*unifrnd(-1,1,size(bob(1:trainEnd)));
 else
-    tmp = T;        u = alice';     Cible = inputSignal(1:trainEnd);
+    tmp = T;
+    u = alice' + A_eps*unifrnd(-1,1,size(alice'));
+    Cible = inputSignal(1:trainEnd) + A_eps*unifrnd(-1,1,size(inputSignal(1:trainEnd)));
 end
 T = trainEnd; %#ok<NASGU>
 
@@ -246,7 +250,7 @@ y_hat = [y_hat zeros(1,T-trainEnd)];
 S = [S ; zeros(T - trainEnd,N+K)];
 
 for t = trainEnd+1:T-1
-    U = alice(t); % Refaire u plus long    
+    U = alice(t) + A_eps*unifrnd(-1,1);  
     y_hat(t) = W_out*S(t,:)';
     S(t+1,:) = majRes(f_RC,delta,a,C,W_in,W,W_fb,...
                       S(t,1:N)',U,y_hat(t),...
