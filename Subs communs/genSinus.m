@@ -80,7 +80,7 @@ function [Message,T_out,varargout] = genSinus(meth,varargin)
                         end
                     T = 2*pi/w;
                     n = length(h:h:T);
-                    Message = [Message  sin(w*(linspace(h,T,n)))];
+                    Message = [Message  sin(w*(linspace(h,T,n)))]; %#ok<*AGROW>
                     T_out = [T_out (h:h:T)+T_out(end)];
                 end
             else

@@ -3,6 +3,7 @@
 % 
 % Calcul d'erreurs pour le mélange
 % --------------------------------
+allplot = 0;
 
 %% 1 - Erreurs
 if formeMessage == 1 || formeMessage == 2
@@ -72,24 +73,30 @@ signalsFig = figure('units','normalized',...
         'Name','Résultats du décryptage et du décodage',...
         'Visible','Off');
 if formeMessage ~= 4
-    subplot(4,1,1)
-        plot(T_out,alice,'c-.'); hold on;
-        plot(T_out,bob,'b-.');
-        plot(T_out,y_hat(1:length(T_out)),'r-.');
-        plot(T_out,alice-bob,'k-.');
-        if fullAttack
-            plot(T_out,z,'y-.');
-            legend('a','b','y','a-b','a-y','Location','NorthEast');
-        else
-            legend('a','b','y','a-b','Location','NorthEast');
-        end
+    if allplot
+        subplot(4,1,1)
+            plot(T_out,alice,'c-.'); hold on;
+            plot(T_out,bob,'b-.');
+            plot(T_out,y_hat(1:length(T_out)),'r-.');
+            plot(T_out,alice-bob,'k-.');
+            if fullAttack
+                plot(T_out,z,'y-.');
+                legend('a','b','y','a-b','a-y','Location','NorthEast');
+            else
+                legend('a','b','y','a-b','Location','NorthEast');
+            end
 
-        xlabel('t [s]');
+            xlabel('t [s]');
 
-        plot([T_out(trainEnd) T_out(trainEnd)],get(gca,'YLim'),...
-            'm','LineWidth',3);
-
-    subplot(4,1,2);
+            plot([T_out(trainEnd) T_out(trainEnd)],get(gca,'YLim'),...
+                'm','LineWidth',3);
+    end
+    
+    if allplot
+        subplot(4,1,2);
+    else
+        subplot(2,1,1);
+    end
         plot(T_out,inputSignal,'c-.'); hold on;
         plot(T_out,Decrypt,'b-.');
         plot(T_out,Decode,'r-.');
@@ -103,17 +110,23 @@ if formeMessage ~= 4
         plot([T_out(trainEnd) T_out(trainEnd)],get(gca,'YLim'),...
             'm','LineWidth',3);
 
-    subplot(4,1,3);
-        plot(T_out,log10(ER_Decrypt),'b'); hold on;
-        plot(T_out,log10(ER_Decode),'g'); 
+    if allplot
+        subplot(4,1,3);
+            plot(T_out,log10(ER_Decrypt),'b'); hold on;
+            plot(T_out,log10(ER_Decode),'g'); 
 
-        legend('Erreur Decrypt','Erreur Decode','Location','NorthEast');
-        xlabel('t [s]');
+            legend('Erreur Decrypt','Erreur Decode','Location','NorthEast');
+            xlabel('t [s]');
 
-        plot([T_out(trainEnd) T_out(trainEnd)],get(gca,'YLim'),...
-            'm','LineWidth',3);
+            plot([T_out(trainEnd) T_out(trainEnd)],get(gca,'YLim'),...
+                'm','LineWidth',3);
+    end
 
-    subplot(4,2,7);
+    if allplot
+        subplot(4,2,7);
+    else
+        subplot(2,2,3)
+    end
         plot(f_input_ex,p_input_ex,'c-.'); hold on;
         plot(f_Decrypt_ex,p_Decrypt_ex,'b-.');
         plot(f_Decode_ex,p_Decode_ex,'r-.');
@@ -123,7 +136,11 @@ if formeMessage ~= 4
         xlim([0 1.2]);
         xlabel('f [Hz]'); title('Exemple');
 
-    subplot(4,2,8);
+    if allplot
+        subplot(4,2,8);
+    else
+        subplot(2,2,4)
+    end
         plot(f_input_msg,p_input_msg,'c-.'); hold on;
         plot(f_Decrypt_msg,p_Decrypt_msg,'b-.');
         plot(f_Decode_msg,p_Decode_msg,'r-.');
@@ -177,3 +194,4 @@ else
 end
 
 set(signalsFig,'Visible','on');
+% set(spectreAliceFig,'Visible','on');

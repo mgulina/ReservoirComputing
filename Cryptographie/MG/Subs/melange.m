@@ -19,7 +19,7 @@ fullAttack = 0;
 %% Succession de sinus
 if formeMessage == 1
     nbrSinus = 7;           % Nombre de bits dans le cas où #omega = 2 (si pas de message entré dans genSin)
-    omega = [0.01 0.04];
+    omega = 2*pi*[0.01 0.02];
     h = 0.1;
     dt = 1/min(omega); % Sera multiplié par 2 pi
 
@@ -32,7 +32,7 @@ if formeMessage == 1
     T_out_msg = T_out_msg + T_ex;
     T_tot = T_ex + T_msg;
 
-    inputFactor = 0.01;
+    inputFactor = 0.02;
     
     inputSignal = inputFactor*[Exemple ; Message(2:end)];
 
@@ -112,7 +112,7 @@ else
     error('La variable nbrFreqFini n''a pas été définie.');
 end
     
-    A_eps = 10^-2; % Bruit pendant la communication
+    A_eps = 10^-4; % Bruit pendant la communication
 
 %% 2 - Transmission du message
 disp('Transmission du message');
@@ -166,11 +166,11 @@ if formeMessage == 1
      N = 250;
 %     gamma = 0.01;
     delta = h;
-    gainIn = 0.9;
+%     gainIn = 1;
     gainFb = 0.;
 %     rho = 0.79;
-%     C = 0.44;
-%     a = 0.9;
+     C = 0.22;
+%      a = 0.9;
 %     LvlNoise = 10^-5;
     
 elseif formeMessage == 2    
@@ -211,12 +211,11 @@ elseif formeMessage == 4
     gainIn = 0.9;
 %     rho = 0.79;
 %     a = 0.9;
-    LvlNoise = 10^-4;
-    if fullAttack
-        C = 0.44; %#ok<*UNRCH>
-        gainFb = 0.8;
+%     C = 0.44;
+%     LvlNoise = 10^-4;
+    if fullAttack      
+        gainFb = 0.8; %#ok<*UNRCH>
     else
-        C = 0.44;
         gainFb = 0;
     end
 end
