@@ -112,24 +112,28 @@ else
     error('La variable nbrFreqFini n''a pas été définie.');
 end
     
-    A_eps = 10^-4; % Bruit pendant la communication
 
 %% 2 - Transmission du message
 disp('Transmission du message');
 %% 2.1 - Initialisation des systèmes d'Alice et Bob
 tau = 17;
 A_filtre = 10;
-source =  @sourceMG;
-alice_tau = 0.5*ones(round((tau+1)/h),1);
+source =  @sourceMG; % Equation de MG
+alice_tau = 0.5*ones(round((tau+1)/h),1); % Conditions initiales
 
 alice = zeros(T,1); alice(1) = alice_tau(round((tau+1)/h));
 bob = alice;
+
+% Bruit pendant la communication
+A_eps = 10^-1*inputFactor; 
+nu_bob = A_eps*unifrnd(-1,1,T,1);
+nu_eve = A_eps*unifrnd(-1,1,T,1);
 
 %% 2.2 - Boucle de transmission
 % t - \tau <= 0
 for t = 1:round((tau)/h)+1
     fa = source(alice_tau(t)) + inputSignal(t);
-    fb = source(alice_tau(t) + A_eps*unifrnd(-1,1));
+    fb = source(alice_tau(t) + nu_bob(t));
     alice(t+1) = alice(t)*exp(-h/A_filtre) + fa*(1 - exp(-h/A_filtre));
     bob(t+1) = bob(t)*exp(-h/A_filtre) + fb*(1 - exp(-h/A_filtre)); 
 end
@@ -138,11 +142,14 @@ end
 for t = round((tau)/h)+2:T-1
     fa = (source(alice(t-round(tau/h))) + source(alice(t-round((tau)/h)+1)))/2 ...
         + inputSignal(t);
-    fb = (source(alice(t-round(tau/h)) + A_eps*unifrnd(-1,1) ) ...
-        + source(alice(t-round((tau)/h)+1) + A_eps*unifrnd(-1,1)))/2;
+    fb = (source(alice(t-round(tau/h)) + nu_bob(t) ) ...
+        + source(alice(t-round((tau)/h)+1) + nu_bob(t)))/2;
     alice(t+1) = alice(t)*exp(-h/A_filtre) + fa*(1 - exp(-h/A_filtre));
     bob(t+1) = bob(t)*exp(-h/A_filtre) + fb*(1 - exp(-h/A_filtre)); 
 end
+
+SNR_bob = var(alice)/var(nu_bob);
+SNR_eve = var(alice)/var(nu_eve);
     
 %% 2.3 - Traitement du signal de sortie et décryptage
 disp('Décryptage');
@@ -222,17 +229,17 @@ end
 
 genResMG;
 
-fullTrain = 1;      transient = 1000;       trainEnd = round((T_ex)/h);
+fullTrain = 1;      transient = 1;       trainEnd = round((T_ex)/h);
 
 % Signal d'apprentissage
 if fullAttack
     tmp = T;
-    u = alice' + A_eps*unifrnd(-1,1,size(alice'));
-    Cible = bob(1:trainEnd) + A_eps*unifrnd(-1,1,size(bob(1:trainEnd)));
+    u = alice' + nu_eve';
+    Cible = bob(1:trainEnd);
 else
     tmp = T;
-    u = alice' + A_eps*unifrnd(-1,1,size(alice'));
-    Cible = inputSignal(1:trainEnd) + A_eps*unifrnd(-1,1,size(inputSignal(1:trainEnd)));
+    u = alice' + nu_eve';
+    Cible = inputSignal(1:trainEnd);
 end
 T = trainEnd; %#ok<NASGU>
 
